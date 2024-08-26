@@ -1,0 +1,284 @@
+import random
+print("\n\n============================Rapid Run=============================")
+Horse_details_list = []                         # creating a list
+group_count = {"A": 0, "B": 0, "C": 0, "D": 0}  # creating group count so that i can set max to 5
+Horse_ID_Sets = set()                           # creating this set so that user can't repeat same id
+exit_program = False                            # use when i enter esc
+race_started = False                            # use when i start the race
+
+
+#____________________________________________DHD_________________________________________________________________
+def delete_horse(horse_id):                                            # function to DHD
+    for horse in Horse_details_list:
+        if horse["Horse_ID"] == horse_id:
+            Horse_details_list.remove(horse)
+            print("Horse details have been deleted.")
+            return
+    print("No Horse found for entered ID.")
+
+#____________________________________________UHD_________________________________________________________________
+def update_horse(horse_id):                                            # function to UHD
+    for horse in Horse_details_list:
+        if horse["Horse_ID"] == horse_id:
+            print(horse)
+            horse["Horse_Name"] = input("Update Horse Name: ") or horse['Horse_Name']
+            horse["Jockey_Name"] = input("Update Jockey Name: ") or horse['Jockey_Name']
+            horse["Age"] = input("Update Age: ") or horse['Age']
+            horse["Breed"] = input("Update Breed: ") or horse['Breed']
+            horse["Race_Record"] = input("Update Race Record : ") or horse['Race_Record']
+            while True:
+                horse["Group"] = input("Update Group (A, B, C, or D): ").upper() or horse['Group']
+                if Group in ["A", "B", "C", "D"]:
+                    if group_count[Group] < 5:              # 5 horses for each group
+                        group_count[Group] += 1
+                        print("Horse details updated successfully!")
+                        return
+                    else:           #user can't update horse to another group if that group is full
+                        print("Group is full. Choose another group.")
+                else:
+                    print("Invalid group. Please enter A, B, C, or D.")
+
+
+#____________________________________________VHD_________________________________________________________________
+def view_horse_details():                                              # function to VHD
+    if not Horse_details_list:
+        print("No horse details available.")
+        return
+    # creating a anonymous function when sorting to take horse as an argument to retun the Horse_ID
+    Horse_details_list.sort(key=lambda horse: horse['Horse_ID'])
+
+    for horse in Horse_details_list:
+        print("\nHorse ID:", horse["Horse_ID"])
+        print("Horse Name:", horse["Horse_Name"])
+        print("Jockey Name:", horse["Jockey_Name"])
+        print("Age:", horse["Age"])
+        print("Breed:", horse["Breed"])
+        print("Race Record:", horse["Race_Record"])
+        print("Group:", horse["Group"])
+
+
+#____________________________________________SHD_________________________________________________________________
+def save_to_text():                                                   # function to SHD
+    with open("horse.txt", "w") as f:
+        for horse in Horse_details_list:
+            f.write(
+                f"Horse ID: {horse['Horse_ID']}\n"
+                f"Horse Name: {horse['Horse_Name']}\n"
+                f"Jockey Name: {horse['Jockey_Name']}\n"
+                f"Age: {horse['Age']}\n"
+                f"Breed: {horse['Breed']}\n"
+                f"Race Record: {horse['Race_Record']}\n"
+                f"Group: {horse['Group']}\n\n"
+            )
+    print("Horse details saved to the TEXT FILE")
+
+
+#____________________________________________SDD.1________________________________________________________________
+def select_four_horses():
+    selected_horses = []                             #creating a list here
+
+    for group in ["A", "B", "C", "D"]:
+        group_horses = [horse for horse in Horse_details_list
+                        if horse["Group"] == group]
+        if group_horses:
+            selected_horse = random.choice(group_horses)          #randomly selecting between horses in a group
+            selected_horses.append(selected_horse)                #adding
+
+    return selected_horses
+
+#____________________________________________SDD.2________________________________________________________________
+def display_selected_horses(selected_horses):
+    print("\nRandomly Selected Horses for the Final Round:")
+    for horse in selected_horses:
+        try:
+            print(f"\n______From Group {horse['Group']}______")
+            print(f"Horse ID: {horse['Horse_ID']}")
+            print(f"Horse Name: {horse['Horse_Name']}")
+            print(f"Jockey Name: {horse['Jockey_Name']}")
+            print(f"Age: {horse['Age']}")
+            print(f"Breed: {horse['Breed']}")
+            print(f"Race Record: {horse['Race_Record']}")
+        except TypeError:
+            print(f"Requires an integer for {horse['Horse_ID']}")
+
+#____________________________________________WHD_________________________________________________________________
+def display_winning_horses(selected_horses):
+    for horse in selected_horses:
+        horse["Race_Time"] = random.randint(0, 90)     #getting random time without floating numbers
+
+    # creating a anonymous function when sorting to take horse as an argument retun the Race_Time
+    selected_horses.sort(key=lambda horse: horse["Race_Time"])
+    print("Results:")
+    for i, horse in enumerate(selected_horses[:3]):         #get selected_horses to select first 3 horses
+        print(f"\n{i + 1} Place:")
+        print(f"Horse ID: {horse['Horse_ID']}")
+        print(f"Horse Name: {horse['Horse_Name']}")
+        print(f"Race Time: {horse['Race_Time']} seconds")
+
+#____________________________________________VWH_________________________________________________________________
+def visualize_winning_horses(selected_horses):
+    print("Visualizing Winning Horses:")
+    # creating a anonymous function when sorting to take horse as an argument retun the Race_Time
+    selected_horses.sort(key=lambda horse: horse['Race_Time'])
+
+    for i, horse in enumerate(selected_horses[:3]):          #get selected_horses to select first 3 horses
+        time_visualization = '*' * int(horse['Race_Time'] / 10)
+        print(f"\nHorse{i + 1}: {time_visualization} {horse['Race_Time']}s ({i + 1}st Place)")
+
+while not exit_program:         #set exit program = False at the top
+    if not race_started:        #set race_started = False at the top
+        start_race = input("\nHas the race started?: ")
+        if start_race.lower() == "yes":   #yes or no
+            race_started = True
+            print("_____________Race has started_____________")
+        elif start_race.lower() == "no":    #yes or no
+            choice = input(
+                "\nType AHD for adding horse details."
+                "\nType DHD for deleting horse details."
+                "\nType UHD for updating horse details."
+                "\nType VHD for viewing the registered horses’ details table."
+                "\nType SHD for saving the horse details to the text file."
+                "\nType SDD for selecting four horses randomly for the major round."
+                "\nType WHD for displaying the Winning horses’ details."
+                "\nType VWH for Visualizing the time of the winning horses."
+                "\nType ESC to exit the program"
+                "\nEnter your choice: ").upper()            #will turn to uppercase even if user enter in lowercase
+
+            if choice == "ESC":
+                exit_program = True
+                print("_______Exited_________")
+                break
+
+            while choice not in ["AHD", "DHD", "UHD", "VHD", "SHD", "SDD", "WHD", "VWH", "ESC"]:
+                print("______INVALID CHOICE_______")
+                choice = input("choice: ").upper()          #will turn to uppercase even if user enter in lowercase
+
+            if choice == "AHD":
+                Horse_details = {}          #creating a dictionary
+                while True:
+                    try:
+                        Horse_ID = int(input("Enter Horse ID: "))
+                        if Horse_ID in Horse_ID_Sets:
+                            print("Entered Horse_ID in use.Enter another Horse_ID.")
+                        else:
+                            Horse_ID_Sets.add(Horse_ID)   #adding to the set created at the top
+                            break
+                    except ValueError:
+                        print("________INVALID Horse_ID_________")   #if left behind wll print this
+
+                Horse_Name = input("Enter Horse Name: ")
+                while not Horse_Name:
+                    print("______Empty Horse_Name_______")          #if left behind wll print this
+                    Horse_Name = input("Enter Horse Name: ")
+
+                Jockey_Name = input("Enter Jockey Name: ")
+                while not Jockey_Name:
+                    print("______Empty Jockey_Name_______")             #if left behind wll print this
+                    Jockey_Name = input("Enter Jockey Name: ")
+
+                Age = input("Enter Horse Age: ")
+                while not Age:
+                    print("______Empty Age_______")                 #if left behind wll print this
+                    Age = input("Enter Horse Age: ")
+
+                Breed = input("Enter Horse Breed: ")
+                while not Breed:
+                    print("______Empty Breed_______")                   #if left behind wll print this
+                    Breed = input("Enter Horse Breed: ")
+
+                Race_Record = input("Enter Race Records of the Horse: ")
+                while not Race_Record:
+                    print("______Empty Race_Record_______")                 #if left behind wll print this
+
+                while True:
+                    Group = input("Groups: A,B,C,D"
+                                  "\nEnter a Group: ").upper()              #will turn to uppercase even if user enter in lowercase
+
+                    if Group in ["A", "B", "C", "D"]:
+                        if group_count[Group] < 5:                  #5 horses for each group
+                            group_count[Group] += 1
+                            break
+                        else:
+                            print("Group is full. Choose another group.")    #if full will print this
+                    else:
+                        print("______Empty Group_________")                 #if left behind wll print this
+
+                Horse_details["Horse_ID"] = Horse_ID
+                Horse_details["Horse_Name"] = Horse_Name
+                Horse_details["Jockey_Name"] = Jockey_Name
+                Horse_details["Age"] = Age
+                Horse_details["Breed"] = Breed
+                Horse_details["Race_Record"] = Race_Record
+                Horse_details["Group"] = Group
+
+                Horse_details_list.append(Horse_details)            #list appending to dictionary
+
+
+            elif choice == "DHD":
+                horse_id_to_delete = int(input("Enter a Horse_ID to begin deleting: "))
+                delete_horse(horse_id_to_delete)        #closing DHD function
+                save_to_text()                          #auto saving to text file
+
+
+            elif choice == "UHD":
+                while True:
+                    try:
+                        horse_id_to_update = int(input("Enter a Horse_ID to begin updating: "))
+                        update_horse(horse_id_to_update)    # closing UHD function
+                        save_to_text()                      # auto-saving to the text file
+                        break                               # exit the loop if the input is a success
+                    except ValueError:
+                        print("Invalid input. Please enter a valid Horse_ID.")
+
+            elif choice == "VHD":
+                view_horse_details()                    #closing VHD function
+
+            elif choice == "SHD":
+                save_to_text()                          #closing SHD function
+
+            elif choice == "SDD":
+                selected_horses = select_four_horses()
+                display_selected_horses(selected_horses)        #closing SDD function
+
+            elif choice == "WHD":
+                if selected_horses:
+                    display_winning_horses(selected_horses)         #closing WHD function
+
+            elif choice == "VWH":
+                if selected_horses:
+                    visualize_winning_horses(selected_horses)       #closing VWh function
+
+                    # if race hase started user can only proceed with SDD, WHD and VWH
+    if race_started:
+        print("\nType SDD for selecting four horses randomly for the major round."
+              "\nType WHD for displaying the Winning horses’ details."
+              "\nType VWH for Visualizing the time of the winning horses."
+              "\nType ESC to exit the program")
+
+        choice = input("\nEnter your choice: ").upper()
+
+        if choice not in ["SDD", "WHD", "VWH", "ESC"]:
+            print("__________ATENTION________"                      #will print this if user try to enter somthing like AHD,DHD etc.
+                  "\nRace has started.You are only allowed to,"
+                  "\n           Select 4 horses for final round"
+                  "\n           Display winning horses"
+                  "\n           Visualize winning horses.")
+
+        if choice == "SDD":
+                selected_horses = select_four_horses()
+                display_selected_horses(selected_horses)            #closing SDD function
+
+        if choice == "WHD":
+                if selected_horses:
+                    display_winning_horses(selected_horses)         #closing WHD function
+
+        if choice == "VWH":
+                if selected_horses:
+                    visualize_winning_horses(selected_horses)       #closing VWh function
+
+        if choice == "ESC":                             #user can exit after entering ESC
+            exit_program = True
+            print("_______Exited_________")
+            break
+
+
